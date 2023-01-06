@@ -17,7 +17,7 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\SteamLibrary\steamapps\common\RimWorld\Mods\Cleanie\1.4\Assemblies\</OutputPath>
+    <OutputPath>Cleanie\1.4\Assemblies\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -62,5 +62,14 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Cleanie\1.4\Assemblies\Cleanie.dll" />
+    <Content Include="Cleanie\About\About.xml" />
+    <Content Include="Cleanie\About\Preview.png" />
+    <Content Include="Cleanie\About\PublishedFileId.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>XCOPY "$(ProjectDir)Cleanie\*.*" "H:\SteamLibrary\steamapps\common\RimWorld\Mods\Cleanie" /Y /I /E</PostBuildEvent>
+  </PropertyGroup>
 </Project>
