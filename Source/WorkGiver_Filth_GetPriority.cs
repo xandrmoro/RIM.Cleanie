@@ -52,7 +52,7 @@ namespace Cleanie
                     __result = GetRoomDefWeights(room.Role);
 
                     var distance = pawn.Position.DistanceToSquared(t.CenterCell);
-                    var belowThreshold = room.GetStat(RoomStatDefOf.Cleanliness) <= Cleanie.Settings.Weights[room.Role.defName].Threshold;
+                    var belowThreshold = room.GetStat(RoomStatDefOf.Cleanliness) <= GetRoomDefThreshold(room.Role);
                     var factor = 0.25f + Math.Min(Math.Max(0.75f - distance / 533f, 0f), 0.75f) * (belowThreshold ? 0.1f : 1f);
                     __result *= factor;
                 }
@@ -71,6 +71,18 @@ namespace Cleanie
             {
                 return 50f;
             }            
+        }
+
+        static float GetRoomDefThreshold(RoomRoleDef def)
+        {
+            if (Cleanie.Settings.Weights.TryGetValue(def.defName, out var pair))
+            {
+                return pair.Threshold;
+            }
+            else
+            {
+                return 0f;
+            }
         }
     }
 }
