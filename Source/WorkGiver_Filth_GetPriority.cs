@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using RimWorld;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Verse;
@@ -10,23 +11,37 @@ namespace Cleanie
     [HarmonyPatch]
     public class WorkGiver_Filth_GetPriority_Patch
     {
-        public static MethodBase TargetMethod()
+        public static IEnumerable<MethodBase> TargetMethods()
         {
-            var assembly = Assembly.GetAssembly(typeof(Pawn));
-            
-            var type = assembly.GetType("RimWorld.WorkGiver_CleanFilth");
-            if (type != null)
+            yield return GetMethod(Assembly.GetAssembly(typeof(Pawn)), "RimWorld");
+
+            if (Cleanie.DubsAssembly != null)
+                yield return GetMethod(Cleanie.DubsAssembly, "DubsBadHygiene");
+        }
+
+        private static MethodBase GetMethod(Assembly assembly, string ns)
+        {
+            var workGiver = assembly.GetType($"{ns}.WorkGiver_CleanFilth");
+
+            if (workGiver == null)
             {
-                return type.GetMethods().First(m => m.Name == "GetPriority" && m.GetParameters().Any(p => p.ParameterType == typeof(TargetInfo)));
+                Log.Error("[Cleanie] Could not find WorkGiver_CleanFilth");
+                return null;
             }
 
-            return null;
+            var target = workGiver.GetMethods().First(m => m.Name == "GetPriority" && m.GetParameters().Any(p => p.ParameterType == typeof(TargetInfo)));
+            if (target == null)
+            {
+                Log.Error("[Cleanie] Could not find WorkGiver_CleanFilth.GetPriority");
+                return null;
+            }
+
+            return target;
         }
 
         static bool Prefix(ref float __result, Pawn pawn, TargetInfo t)
         {
             var room = t.Cell.GetRoom(t.Map);
-
 
             if (room == null)
             {
@@ -57,6 +72,9 @@ namespace Cleanie
                     __result *= factor;
                 }
             }
+#if DEBUG
+            Log.Message($"[Cleanie] {pawn.Name} {pawn.Position} {t.Cell} {room.Role.label} {__result}");
+#endif
 
             return false;
         }

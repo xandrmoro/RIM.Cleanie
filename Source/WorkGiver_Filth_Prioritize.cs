@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Verse;
@@ -8,17 +9,32 @@ namespace Cleanie
     [HarmonyPatch]
     public class WorkGiver_Filth_Prioritize_Patch
     {
-        public static MethodBase TargetMethod()
+        public static IEnumerable<MethodBase> TargetMethods()
         {
-            var assembly = Assembly.GetAssembly(typeof(Pawn));
+            yield return GetMethod(Assembly.GetAssembly(typeof(Pawn)), "RimWorld");
 
-            var type = assembly.GetType("RimWorld.WorkGiver_CleanFilth");
-            if (type != null)
+            if (Cleanie.DubsAssembly != null)
+                yield return GetMethod(Cleanie.DubsAssembly, "DubsBadHygiene");
+        }
+
+        private static MethodBase GetMethod(Assembly assembly, string ns)
+        {
+            var workGiver = assembly.GetType($"{ns}.WorkGiver_CleanFilth");
+
+            if (workGiver == null)
             {
-                return type.GetProperties().Single(p => p.Name == "Prioritized").GetGetMethod();
+                Log.Error("[Cleanie] Could not find WorkGiver_CleanFilth");
+                return null;
             }
 
-            return null;
+            var target = workGiver.GetProperties().Single(p => p.Name == "Prioritized").GetGetMethod();
+            if (target == null)
+            {
+                Log.Error("[Cleanie] Could not find WorkGiver_CleanFilth.GetPriority");
+                return null;
+            }
+
+            return target;
         }
 
         static bool Prefix(ref bool __result)
