@@ -73,4 +73,8 @@
   <PropertyGroup>
     <PostBuildEvent>XCOPY "$(ProjectDir)\..\Cleanie\*.*" "H:\SteamLibrary\steamapps\common\RimWorld\Mods\Cleanie" /Y /I /E</PostBuildEvent>
   </PropertyGroup>
+  <ItemGroup>
+    <Publicize Include="Assembly-CSharp" />
+    <Publicize Include="BadHygiene" />
+  </ItemGroup>
 </Project>

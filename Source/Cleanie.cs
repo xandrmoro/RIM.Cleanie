@@ -1,30 +1,20 @@
 ﻿using HarmonyLib;
 using System;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
 using Verse;
 
 namespace Cleanie
 {
-
     public class Cleanie : Mod
     {
         public static CleanieSettings Settings { get; private set; }
 
-        public static Assembly DubsAssembly { get; private set; }
+        public static bool DubsActive { get; private set; }
 
         public Cleanie(ModContentPack contentPack) : base(contentPack)
         {
             Settings = GetSettings<CleanieSettings>();
-
-            var badHygiene = LoadedModManager.RunningMods.FirstOrDefault(m => m.PackageId.EqualsIgnoreCase("Dubwise.DubsBadHygiene"));
-
-            if (badHygiene != null)
-            {
-                Log.Message("[Cleanie] Dubs Bad Hygiene detected, applying patch");
-                DubsAssembly = badHygiene.assemblies.loadedAssemblies.Single(a => a.GetName().Name == "BadHygiene");
-            }
 
             new Harmony(Content.PackageIdPlayerFacing).PatchAll();
         }
