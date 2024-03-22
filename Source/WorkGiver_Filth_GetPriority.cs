@@ -24,6 +24,14 @@ namespace Cleanie
             }
             else
             {
+                var roomWeight = GetRoomDefWeights(room.Role);
+
+                if (roomWeight < 1f)
+                { 
+                    __result = 0;
+                    return false;
+                }
+
                 var dnd = false;
 
                 if (Cleanie.Settings.DoNotDisturb 
@@ -39,7 +47,7 @@ namespace Cleanie
                 }
                 else
                 {
-                    __result = GetRoomDefWeights(room.Role);
+                    __result = roomWeight;
 
                     var distance = pawn.Position.DistanceToSquared(t.CenterCell);
                     var belowThreshold = room.GetStat(RoomStatDefOf.Cleanliness) <= GetRoomDefThreshold(room.Role);
