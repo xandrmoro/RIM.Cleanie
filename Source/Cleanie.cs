@@ -30,7 +30,7 @@ namespace Cleanie
         {
             var rect = new Rect(inRect.x + 20, inRect.y, inRect.width - 20f, inRect.height);
 
-            var defs = DefDatabase<RoomRoleDef>.AllDefs.OrderBy(def => def.defName == "None" ? "Outdoors" : def.PostProcessedLabelCap).ToList();
+            var defs = DefDatabase<RoomRoleDef>.AllDefs.OrderBy(def => def.defName == "None" ? "Outdoors" : def.LabelCap.ToString()).ToList();
 
             var view = new Rect(0, 0, rect.width - 16f, defs.Count * 24f + 5f);
 
@@ -97,7 +97,7 @@ namespace Cleanie
 
                         foreach (RoomRoleDef roomDef in defs)
                         {
-                            listingInternal.Label(roomDef.defName == "None" ? "Outdoors" : roomDef.PostProcessedLabelCap);
+                            listingInternal.Label(roomDef.defName == "None" ? (TaggedString)"Outdoors" : roomDef.LabelCap);
                         }
 
                         listingInternal.NewColumn();
