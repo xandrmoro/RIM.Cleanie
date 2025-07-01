@@ -36,14 +36,11 @@ namespace Cleanie
 
             Listing_Standard listingInternal = new Listing_Standard(view, () => scrollPosition), listingExternal = new Listing_Standard(), listingHeaders = new Listing_Standard();
 
-            if (Settings.Weights.Count < defs.Count)
+            foreach (RoomRoleDef roomDef in defs)
             {
-                foreach (RoomRoleDef roomDef in defs)
+                if (!Settings.Weights.ContainsKey(roomDef.defName))
                 {
-                    if (!Settings.Weights.ContainsKey(roomDef.defName))
-                    {
-                        Settings.Weights.Add(roomDef.defName, new CleanieSettings.Pair { Weight = 50f, Threshold = -0.5f });
-                    }
+                    Settings.Weights.Add(roomDef.defName, new CleanieSettings.Pair { Weight = 50f, Threshold = -0.5f });
                 }
             }
 
@@ -93,60 +90,66 @@ namespace Cleanie
                 {
                     listingInternal.Begin(view);
                     {
-                        listingInternal.ColumnWidth = 200f;
-
-                        foreach (RoomRoleDef roomDef in defs)
+                        try
                         {
-                            listingInternal.Label(roomDef.defName == "None" ? (TaggedString)"Outdoors" : roomDef.LabelCap);
-                        }
+                            listingInternal.ColumnWidth = 200f;
 
-                        listingInternal.NewColumn();
-
-                        listingInternal.ColumnWidth = 200;
-
-                        listingInternal.Gap(4f);
-
-                        foreach (RoomRoleDef roomDef in defs)
-                        {
-                            Settings.Weights[roomDef.defName].Weight = (float)Math.Round(listingInternal.Slider(Settings.Weights[roomDef.defName].Weight, 0, 100f));
-                        }
-
-                        listingInternal.NewColumn();
-
-                        listingInternal.ColumnWidth = 40;
-
-                        foreach (RoomRoleDef roomDef in defs)
-                        {
-                            listingInternal.Label(Settings.Weights[roomDef.defName].Weight.ToString());
-                        }
-
-                        listingInternal.NewColumn();
-
-                        listingInternal.ColumnWidth = 200;
-
-                        listingInternal.Gap(4f);
-
-                        foreach (RoomRoleDef roomDef in defs)
-                        {
-                            if (roomDef.defName == "None")
+                            foreach (RoomRoleDef roomDef in defs)
                             {
-                                listingInternal.Gap(22f);
+                                listingInternal.Label(roomDef.defName == "None" ? (TaggedString)"Outdoors" : roomDef.LabelCap);
                             }
-                            else
+
+                            listingInternal.NewColumn();
+
+                            listingInternal.ColumnWidth = 200;
+
+                            listingInternal.Gap(4f);
+
+                            foreach (RoomRoleDef roomDef in defs)
                             {
-                                Settings.Weights[roomDef.defName].Threshold = (float)(Math.Round(listingInternal.Slider(Settings.Weights[roomDef.defName].Threshold, -5f, 1f) * 4) / 4f);
+                                Settings.Weights[roomDef.defName].Weight = (float)Math.Round(listingInternal.Slider(Settings.Weights[roomDef.defName].Weight, 0, 100f));
+                            }
+
+                            listingInternal.NewColumn();
+
+                            listingInternal.ColumnWidth = 40;
+
+                            foreach (RoomRoleDef roomDef in defs)
+                            {
+                                listingInternal.Label(Settings.Weights[roomDef.defName].Weight.ToString());
+                            }
+
+                            listingInternal.NewColumn();
+
+                            listingInternal.ColumnWidth = 200;
+
+                            listingInternal.Gap(4f);
+
+                            foreach (RoomRoleDef roomDef in defs)
+                            {
+                                if (roomDef.defName == "None")
+                                {
+                                    listingInternal.Gap(22f);
+                                }
+                                else
+                                {
+                                    Settings.Weights[roomDef.defName].Threshold = (float)(Math.Round(listingInternal.Slider(Settings.Weights[roomDef.defName].Threshold, -5f, 1f) * 4) / 4f);
+                                }
+                            }
+
+                            listingInternal.NewColumn();
+
+                            listingInternal.ColumnWidth = 40;
+
+                            foreach (RoomRoleDef roomDef in defs)
+                            {
+                                listingInternal.Label(Settings.Weights[roomDef.defName].Threshold.ToString());
                             }
                         }
-
-                        listingInternal.NewColumn();
-
-                        listingInternal.ColumnWidth = 40;
-
-                        foreach (RoomRoleDef roomDef in defs)
+                        catch (Exception e)
                         {
-                            listingInternal.Label(Settings.Weights[roomDef.defName].Threshold.ToString());
+                            Log.Error($"Cleanie: Error in settings window: {e.Message}\n{e.StackTrace}");
                         }
-
                     } listingInternal.End();
                 } Widgets.EndScrollView();
 
